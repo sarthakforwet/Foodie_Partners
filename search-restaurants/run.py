@@ -15,7 +15,7 @@ def home():
 		q=request.form['Query']
 		headers={'Accept': "application/json","user-key": str(User_key)}
 		headers2 = {'Authorization': 'prj_live_pk_feddf0d04ae764d8157faf0d35e0926e711d8c8d',}
-		params2 = (('query', 'indore'),)
+		params2 = (('query', address),)
 		response2 = requests.get('https://api.radar.io/v1/geocode/forward', headers=headers2, params=params2)
 		data2 = response2.json()
 		Lat = data2['addresses'][0]['latitude']
