@@ -73,7 +73,8 @@ def profile_validation():
     if request.method == 'POST' :
         # Create variables for easy access
         contact_no = request.form.get('contact_no')
-
+        location=request.form.get('location')
+        age=request.form.get('age')
 
         ID=session['ID']
 
@@ -81,7 +82,7 @@ def profile_validation():
         cursor.execute("SELECT * from user_detail where ID=%s", (ID,))
         pro1 = cursor.fetchone()
 
-        cursor.execute('UPDATE user_detail set contact_no= %s   WHERE ID= %s',( contact_no , ID,));
+        cursor.execute('UPDATE user_detail set contact_no= %s, age= %d, location=%s   WHERE ID= %s',( contact_no , age,location,ID,));
         conn.connection.commit()
         flash('You have successfully updated your profile!')
         return render_template('profile.html',pro1=pro1)
@@ -219,7 +220,7 @@ def predict():
 
 
 
-    r2 = cur.execute('SELECT cuisine,rate FROM cs WHERE ID = %s ', (ID,))
+    r1 = cur.execute('SELECT cuisine,rate FROM cs WHERE ID = %s ', (ID,))
     s1 = cur.fetchall()
     r2= cur.execute('SELECT name FROM user_detail WHERE ID = %s ', (ID,))
     user_name=cur.fetch()
