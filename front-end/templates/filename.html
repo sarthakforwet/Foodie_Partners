@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/filename_style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <title>Disha | Suggestions</title>
+
+</head>
+<body  style="margin-top:30px; ">
+<center><h1 style="font-family:Bookman; font-size: 70px; " >Job Title Predictions</h1></center><center><hr style="width:80%;"></center>
+
+<div class="container mb-3" style="margin-top:30px; margin-bottom:20px;">
+
+    <i><h3 class="mt-3" style="font-size:25px;"> {{predictedtitle[0]}} </h3></i>
+    <div class="container">
+      <div class="skills html sk" style="font-size: 20px;">{{ predictedValue[0] }}</div>
+    </div>
+
+    <i><h3 class="mt-3" style="font-size:25px;">{{predictedtitle[1]}}</h3></i>
+    <div class="container">
+      <div class="skills css" style="font-size: 20px;">{{ predictedValue[1] }}</div>
+    </div>
+
+    <i><h3 class="mt-3" style="font-size:25px;">{{predictedtitle[2]}}</h3></i>
+    <div class="container">
+      <div class="skills js" style="font-size: 20px;">{{ predictedValue[2] }}</div>
+    </div>
+<div><br>
+    <!--top skills-->
+<section>
+<div class="container mt-4" style="margin-top:50px; font-size:20px;">
+    <p style="text-align:center;">Also, for the most probable prediction which is <i>{{ predictedtitle[0] }}</i>, these are some of the skills which are required in most of the companies. On the right side, the list shows those skills which are not already present in your skillset but are required for the job title. <br>
+    You may enhance your skills accordingly if you wish to score up the chart.</p>
+</div>
+</section>
+
+<section>
+<div class="container mt-5 mb-3" >
+    <div class="row">
+        <div class="col-md-5">
+            <ul class="list-group">
+                  <li class="list-group-item active bg-dark">Top skills required for {{ predictedtitle[0] }}</li>
+                    {% for i in top %}
+                  <li class="list-group-item" style="font-size:20px;">{{ i }}</li>
+                    {% endfor %}
+
+            </ul>
+        </div>
+
+        <div class="col-md-2"></div>
+
+        <div class="col-md-5">
+            <ul class="list-group">
+                  <li class="list-group-item active bg-dark" >Further Enhancements Required</li>
+                {% for j in suggestion %}
+                  <li class="list-group-item" style="font-size:18px;">{{ j }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+</section><br>
+
+    <!--salary prediction-->
+<center><h2 style="font-family:Bookman; font-size: 70px; " class="mt-3">Salary Predictions</h2></center><center><hr style="width:93%;"></center>
+
+<section>
+<div class="container mt-4" style="margin-top:50px; font-size:20px;">
+    <p style="text-align:center;">According to the predicted Job Title which is <i>{{ predictedtitle[0] }}</i> and
+        the preferred Location <i>{{ location1 }}</i>, the predicted salary for you is in the range: ,
+    </p>
+</div>
+</section>
+
+<div class="container">
+    <div class="row mb-3">
+        <div class="col-md-3"></div>
+        <div class="col-md-6 block">
+            <p class="circle"  style="background: #ffe6ff;"><span style="font-size:20px;"><u>Salary Range</u><i> {{ sal_prediction1 }}</i></span></p>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div><br>
+
+<!--apply for jobs-->
+
+<div class="container mt-4" style="border:4px solid red; width:30%; padding:6px;">
+<center><h2>Looking for a Job?</h2></center>
+<center><p>A Job role that best suits you!!</p></center>
+<center><button type="button" class="btn btn-info"><a style="color:white;" href="{{ a }}">Apply now</a></button></center>
+</div>
+
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</body>
+</html>

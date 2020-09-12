@@ -1,0 +1,128 @@
+.container {
+      width: 100%;
+      background-color: #ffffff;
+      box-sizing: border-box;
+    }
+
+/* apply button
+
+
+.btn-1 {
+  background-color: #F27935;
+}
+.btn-1 .round {
+  background-color: #f59965;
+}
+
+a {
+  text-decoration: none;
+  -moz-border-radius: 30px;
+  -webkit-border-radius: 30px;
+  border-radius: 30px;
+  padding: 12px 53px 12px 23px;
+  color: #fff;
+  text-transform: uppercase;
+  font-family: sans-serif;
+  font-weight: bold;
+  position: relative;
+  -moz-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  display: inline-block;
+}
+a span {
+  position: relative;
+  z-index: 3;
+}
+a .round {
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  -moz-transition: all 0.3s ease-out;
+  -o-transition: all 0.3s ease-out;
+  -webkit-transition: all 0.3s ease-out;
+  transition: all 0.3s ease-out;
+  z-index: 2;
+}
+a .round i {
+  position: absolute;
+  top: 50%;
+  margin-top: -6px;
+  left: 50%;
+  margin-left: -4px;
+  -moz-transition: all 0.3s;
+  -o-transition: all 0.3s;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+}
+
+.txt {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.type-1 a:hover {
+  padding-left: 48px;
+  padding-right: 28px;
+}
+.type-1 a:hover .round {
+  width: calc(100% - 6px);
+  -moz-border-radius: 30px;
+  -webkit-border-radius: 30px;
+  border-radius: 30px;
+}
+.type-1 a:hover .round i {
+  left: 12%;
+}
+
+
+
+ End apply button */
+.circle {
+    background: red;
+	border-radius:50%;
+	color: black;
+	display:table;
+	height: 200px;
+	font-weight: bold;
+	font-size: 1.2em;
+	width: auto;
+	margin:0 auto;
+}
+.circle span {
+	display:table-cell;
+	vertical-align:middle;
+	height:200px;
+	width:200px;
+	text-align:center;
+	padding: 0 15px;
+}
+
+.circle h4 {
+	display:table-cell;
+	vertical-align:middle;
+	height:200px;
+	width:200px;
+	text-align:center;
+	padding: 0 15px;
+}
+    .skills {
+      text-align: right;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      color: white;
+    }
+
+    .html {width: 90%; background-color: #4CAF50;}
+    .css {width: 80%; background-color: #2196F3;}
+    .js {width: 65%; background-color: #f44336;}
+    .php {width: 60%; background-color: #808080;}
+
+    .list-group-item active
+    { background-color:	rgb(0, 0, 0);   }
