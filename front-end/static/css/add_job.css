@@ -1,0 +1,28 @@
+.c1{
+    margin:0px;
+    background-image: url("add_job1.jpg");
+    height: 100%;
+    width:100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity:0.8;
+}
+.c2{
+    background-color: rgba(0, 0, 0,0.6);
+    width: 320px;
+    padding: 20px 0px 0px;
+    border: 4px black solid;
+    margin: 0% 40%;
+}
+
+.c2{
+    background-color: rgba(0, 0, 0,0.6);
+    width: 290px;
+    padding: 20px 0px 0px;
+    border: 4px black solid;
+}
+
+.c3 {
+background: #e2ebf0 ;
+/*background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);*/
+}
