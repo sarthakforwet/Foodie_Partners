@@ -263,7 +263,7 @@ def predict():
         print("Getting Recommendations ready")
         print("=" * 25)
 
-
+        
         new_algo.fit(trainset)
 
         # Now getting the predictions with temporarily updated dataset
@@ -292,4 +292,6 @@ if __name__ == "__main__":
 
 ##
  #create table user_detail(Id int not Null uique au' at line 1
-#mysql>  create table user_detail(Id int not Null unique auto_increment, email varchar(255),name varchar(255) not null,password varchar(255) not null,contact_no int (11),age int(3),constraint check_contact_id check(contact_no like'[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),constraint check_mail check(email like '%@%.%'),primary key(email));
+ # database:pr
+ # create table cs (Id int not NULL, cuisine varchar(30),rate int);
+#mysql>  create table user_detail(Id int not Null unique auto_increment, email varchar(255),name varchar(255) not null,password varchar(255) not null,contact_no int (11),age int(3),location varchar(255),constraint check_contact_id check(contact_no like'[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),constraint check_mail check(email like '%@%.%'),primary key(email));
