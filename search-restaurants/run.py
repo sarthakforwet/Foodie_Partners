@@ -6,14 +6,13 @@ app = Flask(__name__)
 @app.route('/',methods=['POST','GET'])
 def home():
 	if request.method=='POST':
-		User_key=request.form['Api']
 		address = request.form['address']
 		Cuisines=request.form['Cuisines']
 		Sort_By=request.form['SortBy']
 		Sort_Order=request.form['SortOrder']
 		count=request.form['Count']
 		q=request.form['Query']
-		headers={'Accept': "application/json","user-key": str(User_key)}
+		headers={'Accept': "application/json","user-key": "6f1a6514744476d55591d9dd25198c4c"}
 		headers2 = {'Authorization': 'prj_live_pk_feddf0d04ae764d8157faf0d35e0926e711d8c8d',}
 		params2 = (('query', address),)
 		response2 = requests.get('https://api.radar.io/v1/geocode/forward', headers=headers2, params=params2)
