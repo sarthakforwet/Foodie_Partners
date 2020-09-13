@@ -16,6 +16,7 @@ app.secret_key=os.urandom(24)
 
 #CONFIS
 RATING_SCALE = (1,5)
+CUSINES = ["Indian", "Italian", "French", "Mongolian", "Chinese"]
 
 #config db
 #db = yaml.load(open('db.yaml'))
@@ -71,6 +72,7 @@ def profile():
         return render_template('profile.html', pro1=pro1)
     # User is not loggedin redirect to login page
     return redirect('/login')
+
 @app.route('/profile_validation', methods=['GET', 'POST'])
 def profile_validation():
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
@@ -191,6 +193,18 @@ def display_cs():
             flash("Add Cusine")
             return redirect(url_for('profile'))
 
+@app.route('/update_tech_validation',methods=['GET','POST'])
+def update_tech_validation():
+        Id = session['ID']
+        u_skill= request.form.get('u_skill')
+        u_rate = request.form.get('u_rate')
+
+        cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute('UPDATE cs set rate=%s WHERE ID = %s and cuisine = %s', (u_rate,Id, u_skill,))
+        conn.connection.commit()
+        flash("Cuisine Updated")
+        return redirect(url_for('display_cs'))
+
 # Restaurat
 @app.route('/res',methods=['POST','GET'])
 def res():
@@ -221,17 +235,17 @@ def res():
 
 @app.route('/predict', methods=['POST', 'GET'])
 def predict():
+    # Template render and get info
     ID = session['ID']
     cur = conn.connection.cursor()
 
-    r1 = cur.execute('SELECT cuisine,rate FROM cs WHERE ID = %s ', (ID,))
+    r1 = cur.execute('SELECT cuisine, rate FROM cs WHERE ID = %s ', (ID,))
     s1 = cur.fetchall()
 
     cusines = {}
     for e in s1:
         cusines[e[0]] = float(e[1])
 
-    #print("\n\n\n", s1, "\n\n\n\n")
 
     r2= cur.execute('SELECT name, age, location FROM user_detail WHERE ID = %s ', (ID,))
     res = cur.fetchone()
@@ -299,13 +313,47 @@ def predict():
             outs = []
             for i in pred:
                 outs.append(trainset.to_raw_uid(i))
-            print("\n\n\n",outs, "\n\n\n")
         return outs[0]
 
     return get_recommendations(user_name, cusines, age, location)
 
 
+def load_data():
+  data_file = open("user_data.pkl", "rb")
+  df = pickle.load(data_file)
+  return df
 
+def dump_data(df):
+  data_file = open("user_data.pkl", "wb")
+  pickle.dump(df, data_file)
+  print("Dumped Successfully!")
+
+def update_user():
+  # Get the data of new user from form and also
+  # from the database to update it.
+
+  user = {}
+  user["u_id"] = ["Suresh"]*len(CUSINES)
+  user["cusine"] = []
+  user["rating"] = []
+
+  ret_data = (("Indian", 3.2),("Italian", 4.2),("French", 3.5),("Mongolian", 5.0),("Chinese", 2.43))
+  for e in ret_data:
+    user["cusine"].append(e[0])
+    user["rating"].append(float(e[1]))
+
+  # Pickle load and dump
+
+  tmp = load_data()
+  #tmp = data.copy()
+  tmp = tmp.append(pd.DataFrame(user))
+  tmp = tmp.reset_index()
+  tmp = tmp.drop("index", axis=1)
+
+  # Dump again to pickle the updated dataset
+  dump_data(tmp)
+
+  return tmp
 
 if __name__ == "__main__":
     app.run(debug=True)

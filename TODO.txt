@@ -11,3 +11,5 @@ Add a config txt file.
 Alter cusine tables to intialize with default values.
 
 Change about.html
+
+Data entry for the current profiles.
