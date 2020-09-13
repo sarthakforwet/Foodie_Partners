@@ -14,6 +14,9 @@ import json
 app = Flask(__name__)
 app.secret_key=os.urandom(24)
 
+#CONFIS
+RATING_SCALE = (1,5)
+
 #config db
 #db = yaml.load(open('db.yaml'))
 app.config['MYSQL_HOST'] = 'localhost'
@@ -79,10 +82,13 @@ def profile_validation():
         ID=session['ID']
 
         cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
-        print("\n\n\n", cursor.execute("SELECT * from user_detail where ID=%s", (ID,)), "\n\n\n")
+        cursor.execute("SELECT * from user_detail where ID=%s", (ID,))
         pro1 = cursor.fetchone()
-
-        cursor.execute(f'UPDATE user_detail set contact_no= {contact_no}, age= {age}, location={location}   WHERE ID= {ID}')
+        print("\n\n\n",pro1)
+        print(age, contact_no, location, "\n\n\n")
+        cursor.execute(f"UPDATE user_detail SET contact_no= {contact_no}, age= {age}, location= {location} WHERE ID= {ID}")
+        cursor
+        #cursor.execute(f"UPDATE user_detail SET location=%s WHERE ID={ID}"%(location))
         conn.connection.commit()
         flash('You have successfully updated your profile!')
         return render_template('profile.html',pro1=pro1)
@@ -220,10 +226,21 @@ def predict():
 
     r1 = cur.execute('SELECT cuisine,rate FROM cs WHERE ID = %s ', (ID,))
     s1 = cur.fetchall()
+
+    cusines = {}
+    for e in s1:
+        cusines[e[0]] = float(e[1])
+
+    #print("\n\n\n", s1, "\n\n\n\n")
+
     r2= cur.execute('SELECT name, age, location FROM user_detail WHERE ID = %s ', (ID,))
-    user_name=cur.fetch()
+    res = cur.fetchone()
+    user_name = res[0]
+    age = res[1]
+    location = res[2]
+
     # Testing if the model is perfectly
-    new_model_file = open("similarity_model.pkl", "rb")
+    new_model_file = open("../similarity_model.pkl", "rb")
     new_algo = pickle.load(new_model_file)
 
     def get_recommendations(user_name=None, cuisines=None, age=None, location=None, gender=None, num_recommendations=5):
@@ -248,7 +265,9 @@ def predict():
         # data.loc["u_id"==user_name,"cusine"==k]
         # assert rows.shape[0]!=0, "User does not exist in dataset"
         #assert len(cuisines) == NUM_CUISINES, "Cuisines must be {NUM_CUISINES}"
-        data.loc[df["u_id"] == user_name, "rating"] = list(map(float, cuisines.values()))
+        data_file = open("../user_data.pkl", "rb")
+        data = pickle.load(data_file)
+        data.loc[data["u_id"] == user_name, "rating"] = list(map(float, cuisines.values()))
 
         # print(rows)
         # data[data["u_id"]==user_name] = rows
@@ -277,10 +296,13 @@ def predict():
             print("Top recommendations")
             print("=" * 15)
 
+            outs = []
             for i in pred:
-                print(trainset.to_raw_uid(i))
+                outs.append(trainset.to_raw_uid(i))
+            print("\n\n\n",outs, "\n\n\n")
+        return outs[0]
 
-
+    return get_recommendations(user_name, cusines, age, location)
 
 
 
