@@ -333,7 +333,7 @@ def update_user():
   # from the database to update it.
 
   user = {}
-  user["u_id"] = ["Suresh"]*len(CUSINES)
+  user["u_id"] = *len(CUSINES)
   user["cusine"] = []
   user["rating"] = []
 
