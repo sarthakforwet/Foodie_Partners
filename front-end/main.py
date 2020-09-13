@@ -2,9 +2,11 @@ from flask import Flask,render_template,request,redirect,session,flash,url_for
 import mysql.connector
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
-from surprise import Dataset, Reader, KNNBasic
+
+
+#from surprise import Dataset, Reader
 import pickle
-from surprise import KNNWithMeans
+#from surprise import KNNWithMeans
 import numpy as np
 import pandas as pd
 
@@ -200,7 +202,7 @@ def res():
         q=request.form['Query']
         headers={'Accept': "application/json","user-key": str(User_key)}
         params={'lat':Lat,'lon':Long,'cuisines':Cuisines,'sort':Sort_By,'order':Sort_Order,'count':count,'q':q}
-        r=requests.get('https://developers.zomato.com/api/v2.1/search',headers=headers,params=params)
+        r=request.get('https://developers.zomato.com/api/v2.1/search',headers=headers,params=params)
         data=r.json()
         data=data['restaurants']
 
@@ -263,7 +265,7 @@ def predict():
         print("Getting Recommendations ready")
         print("=" * 25)
 
-        
+
         new_algo.fit(trainset)
 
         # Now getting the predictions with temporarily updated dataset
