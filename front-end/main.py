@@ -100,10 +100,10 @@ def profile_validation():
         pro1 = cursor.fetchone()
         flash('Enter valid response')
         return render_template('profile.html',pro1=pro1)
+
 @app.route('/about')
 def about_home():
     return render_template('about.html')
-
 
 @app.route('/login_validation', methods=['POST'])
 def login_validation():
