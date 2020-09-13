@@ -12,3 +12,6 @@ An application which helps people find their foodie partner!
 - After going to find Match he can update cuisine and then will get 4 foodie-partners to choose from.
 - When he goes to Find Restaurants he will have to enter the location and based on it he will get suggestions of top restaurants based on the rating found from Zomato API.
 
+# Future Scope
+- [ ] Location personalization for recommendations.
+- [ ] Re-filtering of the recommendations specifically for age and gender preferences.
