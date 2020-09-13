@@ -1,5 +1,5 @@
 from flask import Flask,render_template,request,redirect,session,flash,url_for
-import mysql.connector
+#import mysql.connector
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 from surprise import Dataset, Reader, KNNBasic
@@ -7,6 +7,7 @@ import pickle
 from surprise import KNNWithMeans
 import numpy as np
 import pandas as pd
+from io import StringIO
 
 import os
 import json
@@ -17,7 +18,7 @@ app.secret_key=os.urandom(24)
 #db = yaml.load(open('db.yaml'))
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_PASSWORD'] = 'Prince@123'
 app.config['MYSQL_DB'] = 'pr'
 conn = MySQL(app)
 #conn=mysql.connector.connect(host="localhost",user="root",password="MySQL@2000",database="registration_sih")
@@ -30,15 +31,15 @@ def First_home():
 
 @app.route('/index')
 def index():
-    return render_template('E:/Job-Prediction/front-end/templates/index.html')
+    return render_template('index.html')
 
 @app.route('/login')
 def login():
-    return render_template('E:/Job-Prediction/front-end/templates/login.html')
+    return render_template('login.html')
 
 @app.route('/register')
 def about():
-    return render_template('E:/Job-Prediction/front-end/templates/register.html')
+    return render_template('register.html')
 
 @app.route('/home')
 def home():
@@ -74,15 +75,14 @@ def profile_validation():
         # Create variables for easy access
         contact_no = request.form.get('contact_no')
         location=request.form.get('location')
-        age=request.form.get('age')
-
+        age=int(request.form.get('age'))
         ID=session['ID']
 
         cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT * from user_detail where ID=%s", (ID,))
+        print("\n\n\n", cursor.execute("SELECT * from user_detail where ID=%s", (ID,)), "\n\n\n")
         pro1 = cursor.fetchone()
 
-        cursor.execute('UPDATE user_detail set contact_no= %s, age= %d, location=%s   WHERE ID= %s',( contact_no , age,location,ID,));
+        cursor.execute(f'UPDATE user_detail set contact_no= {contact_no}, age= {age}, location={location}   WHERE ID= {ID}')
         conn.connection.commit()
         flash('You have successfully updated your profile!')
         return render_template('profile.html',pro1=pro1)
@@ -218,11 +218,9 @@ def predict():
     ID = session['ID']
     cur = conn.connection.cursor()
 
-
-
     r1 = cur.execute('SELECT cuisine,rate FROM cs WHERE ID = %s ', (ID,))
     s1 = cur.fetchall()
-    r2= cur.execute('SELECT name FROM user_detail WHERE ID = %s ', (ID,))
+    r2= cur.execute('SELECT name, age, location FROM user_detail WHERE ID = %s ', (ID,))
     user_name=cur.fetch()
     # Testing if the model is perfectly
     new_model_file = open("similarity_model.pkl", "rb")
