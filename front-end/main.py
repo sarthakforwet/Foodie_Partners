@@ -1,5 +1,5 @@
 from flask import Flask,render_template,request,redirect,session,flash,url_for
-#import mysql.connector
+import mysql.connector
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 
@@ -20,7 +20,7 @@ app.secret_key=os.urandom(24)
 #db = yaml.load(open('db.yaml'))
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Prince@123'
+app.config['MYSQL_PASSWORD'] = ''
 app.config['MYSQL_DB'] = 'pr'
 conn = MySQL(app)
 #conn=mysql.connector.connect(host="localhost",user="root",password="MySQL@2000",database="registration_sih")
@@ -84,7 +84,7 @@ def profile_validation():
         print("\n\n\n", cursor.execute("SELECT * from user_detail where ID=%s", (ID,)), "\n\n\n")
         pro1 = cursor.fetchone()
 
-        cursor.execute(f'UPDATE user_detail set contact_no= {contact_no}, age= {age}, location={location}   WHERE ID= {ID}')
+        cursor.execute('UPDATE user_detail set contact_no= %s ,location=%s,age=%s  WHERE ID= %s',( contact_no ,location,age, ID,))
         conn.connection.commit()
         flash('You have successfully updated your profile!')
         return render_template('profile.html',pro1=pro1)
@@ -145,7 +145,7 @@ def add_user():
     cursor.execute("""SELECT * FROM `user_detail` WHERE `email` LIKE '{}'""".format(email))
     myuser=cursor.fetchall()
     session['ID']=myuser[0][0]
-    return redirect('/home')
+    return redirect('/profile')
 
 @app.route('/logout')
 def logout():
@@ -294,4 +294,4 @@ if __name__ == "__main__":
  #create table user_detail(Id int not Null uique au' at line 1
  # database:pr
  # create table cs (Id int not NULL, cuisine varchar(30),rate int);
-#mysql>  create table user_detail(Id int not Null unique auto_increment, email varchar(255),name varchar(255) not null,password varchar(255) not null,contact_no int (11),age int(3),location varchar(255),constraint check_contact_id check(contact_no like'[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),constraint check_mail check(email like '%@%.%'),primary key(email));
+#mysql>  create table user_detail(Id int not Null unique auto_increment, email varchar(255),name varchar(255) not null,password varchar(255) not null,contact_no varchar (11),age int(3),location varchar(255),constraint check_contact_id check(contact_no like'[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),constraint check_mail check(email like '%@%.%'),primary key(email));
