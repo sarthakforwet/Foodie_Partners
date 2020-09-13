@@ -8,6 +8,7 @@ from surprise import KNNWithMeans
 import numpy as np
 import pandas as pd
 from io import StringIO
+import requests
 
 import os
 import json
@@ -87,7 +88,7 @@ def profile_validation():
         cursor.execute("SELECT * from user_detail where ID=%s", (ID,))
         pro1 = cursor.fetchone()
 
-        cursor.execute(f"UPDATE user_detail SET contact_no={contact_no} , age={age}, location={location } WHERE ID= {ID}")
+        cursor.execute(f"UPDATE user_detail SET contact_no={contact_no} , age={age}, location={location} WHERE ID= {ID}")
         #cursor.execute(f"UPDATE user_detail SET location=%s WHERE ID={ID}"%(location))
         conn.connection.commit()
         flash('You have successfully updated your profile!')
@@ -149,7 +150,7 @@ def add_user():
     cursor.execute("""SELECT * FROM `user_detail` WHERE `email` LIKE '{}'""".format(email))
     myuser=cursor.fetchall()
     session['ID']=myuser[0][0]
-    return redirect('/home')
+    return redirect('/profile')
 
 @app.route('/logout')
 def logout():
@@ -157,7 +158,7 @@ def logout():
     return redirect('/')
 
 @app.route('/cs_validation', methods=['POST','GET'])
-def skill_validation():
+def cs_validation():
         Id = session['ID']
         cuisine = request.form.get('cuisine')
         rate = request.form.get('rate')
@@ -219,10 +220,10 @@ def update_tech_validation():
         cursor.execute(f"select name from user_detail where ID={Id}")
 
         user_name = cursor.fetchone()
-        print("\n\n\n", user_name, "\n\n\n")
+
         # Update the pickle file
         user = {}
-        user["u_id"] = [user_name["name"]]*len(CUSINES)
+        user["u_id"] = [user_name["name"]]
         user["cusine"] = u_skill
         user["rating"] = u_rate
         print("\n\n", user, "\n\n")
@@ -240,26 +241,36 @@ def update_tech_validation():
 # Restaurat
 @app.route('/res',methods=['POST','GET'])
 def res():
-    result = []
     if request.method=='POST':
-        User_key=request.form['Api']
-        Lat=request.form['Lat']
-        Long=request.form['Long']
-        Cuisines=request.form['Cuisines']
-        Sort_By=request.form['SortBy']
-        Sort_Order=request.form['SortOrder']
+        address = request.form['address']
         count=request.form['Count']
-        q=request.form['Query']
-        headers={'Accept': "application/json","user-key": str(User_key)}
-        params={'lat':Lat,'lon':Long,'cuisines':Cuisines,'sort':Sort_By,'order':Sort_Order,'count':count,'q':q}
+        headers={'Accept': "application/json","user-key": "6f1a6514744476d55591d9dd25198c4c"}
+        headers2 = {'Authorization': 'prj_live_pk_feddf0d04ae764d8157faf0d35e0926e711d8c8d',}
+        params2 = (('query', address),)
+        response2 = requests.get('https://api.radar.io/v1/geocode/forward', headers=headers2, params=params2)
+        data2 = response2.json()
+        Lat = data2['addresses'][0]['latitude']
+        Long = data2['addresses'][0]['longitude']
+        params={'lat':Lat,'lon':Long,'count':count}
         r=requests.get('https://developers.zomato.com/api/v2.1/search',headers=headers,params=params)
+
         data=r.json()
         data=data['restaurants']
 
+        result=[]
+        name = []
+        address = []
+        rating = []
+        images = ['static/food1.jpg','static/food2.jpg','static/food3.jpg','static/food4.jpg','static/food5.jpg','static/food6.jpg',
+		'static/food7.jpg','static/food8.jpg','static/food9.jpg','static/food10.jpg','static/food11.jpg','static/food12.jpg','static/food13.jpg','static/food14.jpg','static/food15.jpg']
         for i in data:
+            name.append((i['restaurant']['name']))
+            address.append((i['restaurant']['location']['address']))
+            rating.append((i['restaurant']['user_rating']['aggregate_rating']))
             result.append((i['restaurant']['name'],i['restaurant']['location']['address'],i['restaurant']['average_cost_for_two'],i['restaurant']['user_rating']['aggregate_rating']))
-        return render_template('response.html',data=result,length=len(result))
-    return render_template('response.html', data=result, length=len(result))
+
+        return render_template('cards.html',address=address,name=name,rating=rating,count=int(count),image_url=images)
+    return render_template('restaurants.html',title='Find restaurants')
 
 
     #return render_template('home.html', title='Find restaurants')
@@ -343,12 +354,25 @@ def predict():
             flash("Oops! no results for these filter settings!")
         else:
             outs = []
+            ages = []
+            locations = []
+            contacts = []
             for i in pred:
+                uname = trainset.to_raw_uid(i)
+                #print("\n\n\n", uname, "\n\n\n")
+                #data = cur.execute("SELECT age, location from user_detail where name=%s"%(uname,))
+                data = cur.execute('select age, location, contact_no from user_detail where name= %s ',(uname,))
+                r = cur.fetchone()
+                ages.append(r[0])
+                locations.append(r[1])
+                contacts.append(r[2])
                 outs.append(trainset.to_raw_uid(i))
-            s = ''.join([e+",  " for e in outs])
-        return s
 
-    return get_recommendations(user_name, cusines, age, location)
+            #s = ''.join([e+",  " for e in outs])
+        return outs, locations, contacts, ages
+    outs, locations, contacts, ages = get_recommendations(user_name, cusines, age, location)
+    print("\n\n\n", outs, "\n\n\n")
+    return render_template("match_info.html", outs=outs, l=len(outs), loc=locations, cont=contacts, age=ages)
 
 
 def load_data():
