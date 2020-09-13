@@ -15,3 +15,7 @@ An application which helps people find their foodie partner!
 # Future Scope
 - [ ] Location personalization for recommendations.
 - [ ] Re-filtering of the recommendations specifically for age and gender preferences.
+
+PS: We maintained pickle files for the model as well as the dataset which would be used for the recommendations.
+as it is faster to load files from pickle rather than getting the same data from database. These pickle files are 
+automatically updated whenever a new user add entries for cuisines+ratings or whenever they update ratings for the cuisines.
