@@ -1,0 +1,5 @@
+surprise
+mysql
+pymysql
+pandas
+flask_mysqldb

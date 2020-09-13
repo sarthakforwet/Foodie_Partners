@@ -1,0 +1,15 @@
+1. Register template not found. - Resolved
+2. Locations and other new values are not reaching the database.
+
+
+Look about locations not taking data.
+Change cusine info to float values.
+Add drop down for cusine.
+
+
+Add a config txt file.
+Alter cusine tables to intialize with default values.
+
+Change about.html
+
+Data entry for the current profiles.

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+      <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/profile_style.css') }}">
+
+    <!-- Bootstrap CSS -->
+
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+   <style>
+        .bg-nav {
+                background: #0F2027;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+		width:100%;
+        }
+
+        .quotation-mark{
+            margin-top: -10px;
+            font-weight: bold;
+            font-size:50px;
+            color:black;
+            font-family: "Times New Roman", Georgia, Serif;
+        }
+
+    </style>
+</head>
+<body>
+
+
+
+<div class="mt container-fluid ">
+    {% block content %}
+    {% for message in get_flashed_messages() %}
+    <div class="{{ category }}" style="text-align:center;">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}{% endblock %}
+    {% endblock %}
+    {{pro}}
+      <div class="row text-center equal-height-columns">
+
+          <!--Column 1-->
+          <div class="col-md-12">
+              <div class="equal-column-content">
+
+                  <h1>Profile</h1>
+                  <div class="card-body">
+                      <form class="form" method="post" action="/profile_validation"><br>
+                        <div class="form-group">
+                            <label>Name</label><br>
+                            <input class="form-control" placeholder="{{pro1['name']}}" name="name" readonly><br>
+                            <label>Email</label><br>
+                            <input  type="text" class="form-control" placeholder="{{pro1['email']}}" name="email" readonly><br>
+                            <label>Contact No.</label><span ></span><br>
+                          <!-- <input type="tel" pattern="[1-9]{1}[0-9]{9}" required="required" placeholder="{{pro1['contact_no']}}" class="form-control" name="contact_no"><br> -->
+                            <input type='tel' required="required"
+                            placeholder="{{pro1['contact_no']}}"
+                            class="form-control" name="contact_no"> <br>
+                            <label>Location</label><br>
+                            <input type="text" class="form-control"  placeholder="{{pro1['location']}}" name="location" ><br>
+							<label>Age</label><br>
+                            <input type="number" min="10" class="form-control" placeholder="{{pro1['age']}}" name="age" ><br>
+                            </div>
+                        </div>
+                  </div>
+                </div>
+          </div>
+<center><input type="submit" style="width:200px;" class="btn btn-primary btn-lg btn-info" value="Save"></center><br><br>
+
+          </form>
+          <!-- End of Column 1-->
+
+
+
+
+<!-- final skill-->
+<div class="container">
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                        <center>
+                        <h3 class="card-title">Cuisines</h3>
+                            <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#exampleModal" data-whatever="@mdo">Add Cuisine</button>
+                        </center>
+
+                            <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                              <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Add new Cuisine</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <form method="post"  action="/cs_validation" >
+                                          <div class="form-group">
+                                            <label for="cuisine">Cuisine</label>
+                                                  <select name="cuisine">
+                                                    <option value = "Italian" name ="cuisine">Italian</option>
+                                                    <option value = "Chinese" name ="cuisine">Chinese</option>
+                                                    <option value = "Mongolian" name ="cuisine">Mongolian</option>
+                                                    <option value = "Indian" name ="cuisine">Indian</option>
+                                              <option value = "French" name ="cuisine">French</option>
+                                                  </select>
+                                          </div>
+                                          <div class="form-group">
+                                            <label class="col-form-label">Rate </label>
+                                          </div>
+                                          <div class="form-check form-check-inline">
+                                                  <input type="radio" class="form-check-input" name="rate"  value="0">
+                                                  <label class="form-check-label" >0</label>
+                                          </div>
+                                          <div class="form-check form-check-inline">
+                                                  <input type="radio" class="form-check-input" name="rate" value="1">
+                                                  <label class="form-check-label" >1</label>
+                                          </div>
+                                          <div class="form-check form-check-inline">
+                                                  <input type="radio" class="form-check-input"  name="rate" value="2">
+                                                  <label class="form-check-label" >2</label>
+                                          </div>
+										  <div class="form-check form-check-inline">
+                                                  <input type="radio" class="form-check-input"  name="rate" value="3">
+                                                  <label class="form-check-label" >3</label>
+                                          </div>
+                                          <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            <input type="submit" class="btn btn-primary"  value="Save" >
+                                          </div>
+                                    </form>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $('#exampleModal').on('show.bs.modal', function (event) {
+              var button = $(event.relatedTarget) // Button that triggered the modal
+              var recipient = button.data('whatever') // Extract info from data-* attributes
+              // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+              // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+              var modal = $(this)
+              modal.find('.modal-title').text('New message to ' + recipient)
+              modal.find('.modal-body input').val(recipient)
+            })
+
+                    var list1 = [];
+                var list2 = [];
+                var n = 1;
+                var x = 0;
+
+                function AddRow(){
+
+                    var AddRown = document.getElementById('show');
+                    var NewRow = AddRown.insertRow(n);
+
+                    list1[x] = document.getElementById("recipient-name").value;
+                    list2[x] = document.getElementById("rate_skill").value;
+
+
+                    var cel1 = NewRow.insertCell(0);
+                    var cel2 = NewRow.insertCell(1);
+
+                    cel1.innerHTML = list1[x];
+                    cel2.innerHTML = list2[x];
+
+                    n++;
+                    x++;
+                }
+
+        </script>
+
+    </div>
+</div><br><br>
+ <script>
+    $('#i_exampleModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget) // Button that triggered the modal
+      var i_recipient = button.data('whatever') // Extract info from data-* attributes
+      // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+      // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+      var modal = $(this)
+      modal.find('.modal-title').text('New message to ' + i_recipient)
+      modal.find('.modal-body input').val(i_recipient)
+    })
+
+    </script>
+
+<!-- butons-->
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+                <a href="/display_cs">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    Display Cuisine
+                </a>
+        </div>
+        <div class="col-md-3">
+
+          <a href="/find_match">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              Find Match
+          </a>
+        </div>
+
+        <div class="col-md-3">
+
+          <a href="/res">
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+              Find Restaurant
+          </a>
+        </div>
+
+        <!-- Predict button-->
+
+
+        <div class="col-md-2"></div>
+    </div>
+  </div>
+
+
+<!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+
+</body>
+</html>
