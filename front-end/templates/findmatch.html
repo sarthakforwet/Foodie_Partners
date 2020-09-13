@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+      <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css') }}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <title>Disha.com | Skill-set</title>
+    <style>
+        .bg-nav {
+                background: #0F2027;  /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #2C5364, #203A43, #0F2027);  /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #2C5364, #203A43, #0F2027); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        }
+
+        .quotation-mark{
+            margin-top: -10px;
+            font-weight: bold;
+            font-size:50px;
+            color:black;
+            font-family: "Times New Roman", Georgia, Serif;
+        }
+
+    </style>
+</head>
+<body>
+<!-- Navigation-->
+<div class="bg-nav text-light d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <img src="static/images/logo1.jpg" class="img-fluid my-0 mr-md-auto font-weight-normal" style="width:100px; height:40px;" alt="logo">
+        <nav class="my-2 my-md-0 mr-md-3">
+            
+            <a class="p-2  text-light" href="/profile">Profile</a>
+            <a class="p-2  text-light" href="/about">About</a>
+        </nav>
+         <a class="btn btn-outline-primary" href="/logout">Log out</a>
+</div>
+<!--// Navigation-->
+<div style="text-align:center;" class="container">
+
+    {% block content %}
+    {% for message in get_flashed_messages() %}
+    <div class="alert alert-warning" style="text-align:center;">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    {% block page_content %}{% endblock %}
+    {% endblock %}
+
+<h1 >Cuisines</h1>
+<table class="table" name="rt" border="1">
+
+  <thead class="" style="background-color: #bfbfbf">
+    <tr>
+      <th scope="col">Cuisine</th>
+      <th scope="col">Rating</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for skill in skillDetails %}
+    <tr>
+      <td><form method="post"  action="/predict" ><input type="text" name="u_skill" value="{{ skill[1] }}" readonly> </td>
+      <td> <input type="text" name="u_rate" value="{{ skill[2] }}"></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+
+</table><br>
+<input type="submit" class="btn btn-primary" value="Update Ratings and Find match" >
+</form>
+</div>
+
+<!--footer-->
+
+<div class="card text-center">
+  <div class="card-header">
+     Designed by Foodie-Partners
+  </div>
+  
+  <div class="card-footer bg-dark text-light text-muted">
+   Copyright&copy;Disha.com | <i> All rights reserved.</i>
+  </div>
+</div>
+
+<!--// footer-->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+
+</body>
+</html>

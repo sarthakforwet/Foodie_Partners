@@ -86,10 +86,8 @@ def profile_validation():
         cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * from user_detail where ID=%s", (ID,))
         pro1 = cursor.fetchone()
-        print("\n\n\n",pro1)
-        print(age, contact_no, location, "\n\n\n")
-        cursor.execute(f"UPDATE user_detail SET contact_no= {contact_no}, age= {age}, location= {location} WHERE ID= {ID}")
-        cursor
+
+        cursor.execute(f"UPDATE user_detail SET contact_no={contact_no} , age={age}, location={location } WHERE ID= {ID}")
         #cursor.execute(f"UPDATE user_detail SET location=%s WHERE ID={ID}"%(location))
         conn.connection.commit()
         flash('You have successfully updated your profile!')
@@ -193,6 +191,20 @@ def display_cs():
             flash("Add Cusine")
             return redirect(url_for('profile'))
 
+@app.route('/find_match', methods=['POST', 'GET'])
+def find_match():
+        Id = session['ID']
+        cur = conn.connection.cursor()
+        resultValue= cur.execute("SELECT * from cs where ID=%s",(Id,))
+
+        cuisineDetails = cur.fetchall()
+
+        if resultValue > 0 :
+            return render_template('findmatch.html', skillDetails=cuisineDetails )
+        else:
+            flash("Add Cusine")
+            return redirect(url_for('profile'))
+
 @app.route('/update_tech_validation',methods=['GET','POST'])
 def update_tech_validation():
         Id = session['ID']
@@ -202,6 +214,26 @@ def update_tech_validation():
         cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('UPDATE cs set rate=%s WHERE ID = %s and cuisine = %s', (u_rate,Id, u_skill,))
         conn.connection.commit()
+
+
+        cursor.execute(f"select name from user_detail where ID={Id}")
+
+        user_name = cursor.fetchone()
+        print("\n\n\n", user_name, "\n\n\n")
+        # Update the pickle file
+        user = {}
+        user["u_id"] = [user_name["name"]]*len(CUSINES)
+        user["cusine"] = u_skill
+        user["rating"] = u_rate
+        print("\n\n", user, "\n\n")
+
+        tmp = load_data()
+        #tmp = data.copy()
+        tmp = tmp.append(pd.DataFrame(user))
+        tmp = tmp.reset_index()
+        tmp = tmp.drop("index", axis=1)
+        dump_data(tmp)
+
         flash("Cuisine Updated")
         return redirect(url_for('display_cs'))
 
@@ -243,9 +275,12 @@ def predict():
     s1 = cur.fetchall()
 
     cusines = {}
-    for e in s1:
-        cusines[e[0]] = float(e[1])
 
+    if request.method == "POST":
+        d = request.form
+        d = d.to_dict(flat=False)
+        for cus, rate in zip(d["u_skill"], d["u_rate"]):
+            cusines[cus] = float(rate)
 
     r2= cur.execute('SELECT name, age, location FROM user_detail WHERE ID = %s ', (ID,))
     res = cur.fetchone()
@@ -287,6 +322,7 @@ def predict():
         # data[data["u_id"]==user_name] = rows
         # print(data[data["u_id"]==user_name])
         reader = Reader(rating_scale=RATING_SCALE)
+
         dataset = Dataset.load_from_df(data[["u_id", "cusine", "rating"]], reader)
         trainset = dataset.build_full_trainset()
 
@@ -304,56 +340,27 @@ def predict():
         # When using age, location and gender constraints, we need to take into
         # account all/more recommendations
         if len(pred) == 0:
-            print("Oops! no results for these filter settings!")
+            flash("Oops! no results for these filter settings!")
         else:
-            print("=" * 15)
-            print("Top recommendations")
-            print("=" * 15)
-
             outs = []
             for i in pred:
                 outs.append(trainset.to_raw_uid(i))
-        return outs[0]
+            s = ''.join([e+",  " for e in outs])
+        return s
 
     return get_recommendations(user_name, cusines, age, location)
 
 
 def load_data():
-  data_file = open("user_data.pkl", "rb")
+  data_file = open("../user_data.pkl", "rb")
   df = pickle.load(data_file)
   return df
 
 def dump_data(df):
-  data_file = open("user_data.pkl", "wb")
+  data_file = open("../user_data.pkl", "wb")
   pickle.dump(df, data_file)
   print("Dumped Successfully!")
 
-def update_user():
-  # Get the data of new user from form and also
-  # from the database to update it.
-
-  user = {}
-  user["u_id"] = *len(CUSINES)
-  user["cusine"] = []
-  user["rating"] = []
-
-  ret_data = (("Indian", 3.2),("Italian", 4.2),("French", 3.5),("Mongolian", 5.0),("Chinese", 2.43))
-  for e in ret_data:
-    user["cusine"].append(e[0])
-    user["rating"].append(float(e[1]))
-
-  # Pickle load and dump
-
-  tmp = load_data()
-  #tmp = data.copy()
-  tmp = tmp.append(pd.DataFrame(user))
-  tmp = tmp.reset_index()
-  tmp = tmp.drop("index", axis=1)
-
-  # Dump again to pickle the updated dataset
-  dump_data(tmp)
-
-  return tmp
 
 if __name__ == "__main__":
     app.run(debug=True)
