@@ -7,6 +7,10 @@
 
       <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css') }}">
 
+      <!--Add icon to the app-->
+      <link rel="shortcut icon" href="{{ url_for('static',
+      filename='fp_icon.ico') }}">
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
 
@@ -14,7 +18,17 @@
   </head>
   <body class="bg-nav">
      <!---Pop up-->
-   
+
+     {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for category, message in messages %}
+          <li class={{ category }}>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
     <div class="alert alert-warning" style="text-align:center;">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
      

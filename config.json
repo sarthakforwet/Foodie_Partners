@@ -1,0 +1,11 @@
+{
+    "RATING_SCALE": [1, 5],
+    "CUSINES": [
+        "Indian",
+        "Italian",
+        "French",
+        "Mongolian",
+        "Chinese"
+    ],
+    "NUM_RECOMMENDATIONS": 4
+}
