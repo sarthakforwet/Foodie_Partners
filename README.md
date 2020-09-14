@@ -17,5 +17,55 @@ An application which helps people find their foodie partner!
 - [ ] Re-filtering of the recommendations specifically for age and gender preferences.
 
 PS: We maintained pickle files for the model as well as the dataset which would be used for the recommendations.
-as it is faster to load files from pickle rather than getting the same data from database. These pickle files are 
+as it is faster to load files from pickle rather than getting the same data from database. These pickle files are
 automatically updated whenever a new user add entries for cuisines+ratings or whenever they update ratings for the cuisines.
+
+# WORK LOCALLY
+- All the configurations are managed through the file `config.json`. Changes in it
+  reflect to the complete application.
+
+- Note that there is a `db_config.json` file that we made for configuring with
+  database and is not present on GitHub (Obviously!) so be sure to create one
+  and edit accordingly.
+
+1. Fork the repo.
+2. Install dependencies using `requirements.txt`.
+3. Right now database is not pushed onto GitHub so consider creating a database
+   using [MySQL Workbench](https://dev.mysql.com/downloads/workbench/) or any editor you prefer.
+4. After creating of database and installing deps, run `front-end/main.py`. This
+   will start a local server for flask and the application will be up for
+   working.
+
+For getting a preview of how the model was created or visualizations, please
+refer to [BonHacketiet.ipynb]("model_notebook/BonHacketiet.ipynb").
+
+# REVIEW OF THE APP
+## Login Screen
+
+![](front-end/static/images/pic1.jpeg)
+
+## Menu Bar
+
+![](front-end/static/images/pic2.jpeg)
+
+## Add a Cuisine
+
+![](front-end/static/images/pic3.jpeg)
+
+## Display Cuisines
+
+![](front-end/static/images/pic4.jpeg)
+
+## Find Match
+
+![](front-end/static/images/pic5.jpeg)
+
+## Find restaurant
+
+![](front-end/static/images/pic6.jpeg)
+
+## Sample recommendations
+
+![](front-end/static/images/pic7.jpeg)
+
+Link to video submitted at hackathon - https://www.youtube.com/watch?v=i9S8DIqNA9E

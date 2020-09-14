@@ -1,35 +1,34 @@
-from flask import Flask,render_template,request,redirect,session,flash,url_for
-#import mysql.connector
-from flask_mysqldb import MySQL
-import MySQLdb.cursors
-from surprise import Dataset, Reader, KNNBasic
-import pickle
-from surprise import KNNWithMeans
-import numpy as np
-import pandas as pd
-from io import StringIO
-import requests
-
 import os
 import json
+import pickle
+import requests
+import numpy as np
+import pandas as pd
+import MySQLdb.cursors
+from io import StringIO
+from flask_mysqldb import MySQL
+from surprise import KNNWithMeans
+from surprise import Dataset, Reader, KNNBasic
+from flask import Flask,render_template,request,redirect,session,flash,url_for
+
+# Initializing the app
 app = Flask(__name__)
 app.secret_key=os.urandom(24)
 
-#CONFIS
-RATING_SCALE = (1,5)
-CUSINES = ["Indian", "Italian", "French", "Mongolian", "Chinese"]
+#CONFIGRATIONS
+config_file = open("../config.json", "r")
+config = json.load(config_file)
 
 #config db
-#db = yaml.load(open('db.yaml'))
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'Prince@123'
-app.config['MYSQL_DB'] = 'pr'
+db_config_file = open("../db_config.json")
+db_cfg = json.load(db_config_file)
+app.config['MYSQL_HOST'] = db_cfg["MYSQL_HOST"]
+app.config['MYSQL_USER'] = db_cfg["MYSQL_USER"]
+app.config['MYSQL_PASSWORD'] = db_cfg["MYSQL_PASSWORD"]
+app.config['MYSQL_DB'] = db_cfg["MYSQL_DB"]
 conn = MySQL(app)
-#conn=mysql.connector.connect(host="localhost",user="root",password="MySQL@2000",database="registration_sih")
-#cursor = conn.cursor()
 
-
+# ===== ROUTES ======= #
 @app.route('/')
 def First_home():
     return render_template('/login.html')
@@ -53,17 +52,12 @@ def home():
     else:
         return redirect('/')
 
-
-
-
 @app.route('/profile')
 def profile():
-    # Check if user is loggedin
+    """Function to lookup profile"""
+    # Check if user is logged in
     if 'loggedin' in session:
         # We need all the account info for the user so we can display it on the profile page
-        '''cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM user_detail WHERE id = %s', (session['ID'],))
-        account = cursor.fetchone()'''
         ID = session['ID']
         cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * from user_detail where Id=%s", (ID,))
@@ -71,11 +65,13 @@ def profile():
 
         # Show the profile page with account info
         return render_template('profile.html', pro1=pro1)
-    # User is not loggedin redirect to login page
+
+    # If user is not logged in, redirect to login page
     return redirect('/login')
 
 @app.route('/profile_validation', methods=['GET', 'POST'])
 def profile_validation():
+    """Function to check and maintain profile"""
     # Check if "username", "password" and "email" POST requests exist (user submitted form)
     if request.method == 'POST' :
         # Create variables for easy access
@@ -88,14 +84,16 @@ def profile_validation():
         cursor.execute("SELECT * from user_detail where ID=%s", (ID,))
         pro1 = cursor.fetchone()
 
-        cursor.execute(f"UPDATE user_detail SET contact_no={contact_no} , age={age}, location={location} WHERE ID= {ID}")
-        #cursor.execute(f"UPDATE user_detail SET location=%s WHERE ID={ID}"%(location))
+        # WIP
+        cursor.execute(f"UPDATE user_detail SET contact_no={contact_no}, \
+        age={age}, location={location} WHERE ID= {ID}")
+
         conn.connection.commit()
         flash('You have successfully updated your profile!')
         return render_template('profile.html',pro1=pro1)
+
     else:
         ID = session['ID']
-
         cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute("SELECT * from user_detail where ID=%s", (ID,))
         pro1 = cursor.fetchone()
@@ -104,22 +102,29 @@ def profile_validation():
 
 @app.route('/about')
 def about_home():
+    """Redirect to About page"""
+    # WIP
     return render_template('about.html')
 
 @app.route('/login_validation', methods=['POST'])
 def login_validation():
+    """Function to check login credentials"""
     # Output message if something goes wrong...
-    msg = ''
+    msg = 'Opps! Forgot your credentials?'
+
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'email' in request.form and 'password' in request.form:
         # Create variables for easy access
         email = request.form['email']
         password = request.form['password']
+
         # Check if account exists using MySQL
         cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM user_detail WHERE email = %s AND password = %s', (email, password,))
+
         # Fetch one record and return result
         account = cursor.fetchone()
+
         # If account exists in accounts table in out database
         if account:
             # Create session data, we can access this data in other routes
@@ -127,17 +132,16 @@ def login_validation():
             session['ID'] = account['Id']
             session['email'] = account['email']
             flash('Logged in Successfully!')
-            # Redirect to home page
-            return redirect('/profile')
+            return redirect('/profile') # redirect to profile page
         else:
-            # Account doesnt exist or username/password incorrect
-            flash('Incorrect username/password!')
+            # Account does not exist or username/password incorrect
+            # WIP
+            flash(msg, "error")
             return render_template('login.html', msg=msg)
-    # Show the login form with message (if any)
-
 
 @app.route('/add_user', methods=['POST'])
 def add_user():
+    """Function to add new user."""
     name=request.form.get('username')
     email= request.form.get('email')
     password = request.form.get('password')
@@ -154,93 +158,94 @@ def add_user():
 
 @app.route('/logout')
 def logout():
+    """Function to log out from app"""
     session.pop('ID')
     return redirect('/')
 
 @app.route('/cs_validation', methods=['POST','GET'])
 def cs_validation():
-        Id = session['ID']
-        cuisine = request.form.get('cuisine')
-        rate = request.form.get('rate')
+    """Function to validate cuisine from database."""
+    Id = session['ID']
+    cuisine = request.form.get('cuisine')
+    rate = request.form.get('rate')
 
-        cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM cs WHERE ID = %s and cuisine = %s', (Id,cuisine,))
-        account1 = cursor.fetchone()
+    cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('SELECT * FROM cs WHERE ID = %s and cuisine = %s', (Id,cuisine,))
+    account1 = cursor.fetchone()
 
-        if account1:
-            flash("Cuisine already exists")
-            return redirect(url_for('profile'))
-        else:
-            cursor.execute("""INSERT INTO `cs` ( `Id`,`cuisine`,`rate`) VALUES
-                            ('{}','{}','{}')""".format(Id, cuisine, rate))
-            conn.connection.commit()
-            flash("Cuisine added")
-            return redirect(url_for('profile'))
-        return redirect('/profile')
-#Display Cuisines
+    if account1:
+        flash("Cuisine already exists")
+        return redirect(url_for('profile'))
+    else:
+        cursor.execute("""INSERT INTO `cs` ( `Id`,`cuisine`,`rate`) VALUES
+                        ('{}','{}','{}')""".format(Id, cuisine, rate))
+        conn.connection.commit()
+        flash("Cuisine added")
+        return redirect(url_for('profile'))
+    return redirect('/profile')
+
 @app.route('/display_cs')
 def display_cs():
-        Id = session['ID']
-        cur = conn.connection.cursor()
-        resultValue= cur.execute("SELECT * from cs where ID=%s",(Id,))
-
-        cuisineDetails= cur.fetchall()
-
-        if resultValue > 0 :
-            return render_template('cuisineset.html', skillDetails=cuisineDetails )
-        else:
-            flash("Add Cusine")
-            return redirect(url_for('profile'))
+    """Function to display current cuisine information for
+    the user currently logged in."""
+    Id = session['ID']
+    cur = conn.connection.cursor()
+    resultValue= cur.execute("SELECT * from cs where ID=%s",(Id,))
+    cuisineDetails= cur.fetchall()
+    if resultValue > 0 :
+        return render_template('cuisineset.html', skillDetails=cuisineDetails )
+    else:
+        flash("Add Cusine")
+        return redirect(url_for('profile'))
 
 @app.route('/find_match', methods=['POST', 'GET'])
 def find_match():
-        Id = session['ID']
-        cur = conn.connection.cursor()
-        resultValue= cur.execute("SELECT * from cs where ID=%s",(Id,))
-
-        cuisineDetails = cur.fetchall()
-
-        if resultValue > 0 :
-            return render_template('findmatch.html', skillDetails=cuisineDetails )
-        else:
-            flash("Add Cusine")
-            return redirect(url_for('profile'))
+    """Function to find a match."""
+    Id = session['ID']
+    cur = conn.connection.cursor()
+    resultValue= cur.execute("SELECT * from cs where ID=%s",(Id,))
+    cuisineDetails = cur.fetchall()
+    if resultValue > 0 :
+        return render_template('findmatch.html', skillDetails=cuisineDetails )
+    else:
+        flash("Add Cusine")
+        return redirect(url_for('profile'))
 
 @app.route('/update_tech_validation',methods=['GET','POST'])
 def update_tech_validation():
-        Id = session['ID']
-        u_skill= request.form.get('u_skill')
-        u_rate = request.form.get('u_rate')
+    """Function to update ratings for particular
+    cuisines corresponding to the particular logged in user."""
+    Id = session['ID']
 
-        cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('UPDATE cs set rate=%s WHERE ID = %s and cuisine = %s', (u_rate,Id, u_skill,))
-        conn.connection.commit()
+    # Getting cuisine and rating (updated) info
+    u_skill= request.form.get('u_skill')
+    u_rate = request.form.get('u_rate')
 
+    # Update in database.
+    cursor = conn.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute('UPDATE cs set rate=%s WHERE ID = %s and cuisine = %s', (u_rate,Id, u_skill,))
+    conn.connection.commit()
+    cursor.execute(f"select name from user_detail where ID={Id}")
+    user_name = cursor.fetchone()
 
-        cursor.execute(f"select name from user_detail where ID={Id}")
+    # Update the pickle file
+    user = {}
+    user["u_id"] = [user_name["name"]]
+    user["cusine"] = u_skill
+    user["rating"] = u_rate
+    tmp = load_data()
+    tmp = tmp.append(pd.DataFrame(user))
+    tmp = tmp.reset_index()
+    tmp = tmp.drop("index", axis=1)
+    dump_data(tmp)
 
-        user_name = cursor.fetchone()
+    flash("Cuisine Updated")
+    return redirect(url_for('display_cs'))
 
-        # Update the pickle file
-        user = {}
-        user["u_id"] = [user_name["name"]]
-        user["cusine"] = u_skill
-        user["rating"] = u_rate
-        print("\n\n", user, "\n\n")
-
-        tmp = load_data()
-        #tmp = data.copy()
-        tmp = tmp.append(pd.DataFrame(user))
-        tmp = tmp.reset_index()
-        tmp = tmp.drop("index", axis=1)
-        dump_data(tmp)
-
-        flash("Cuisine Updated")
-        return redirect(url_for('display_cs'))
-
-# Restaurat
+# Find Restraunts
 @app.route('/res',methods=['POST','GET'])
 def res():
+    """Function to find nearby restaurants."""
     if request.method=='POST':
         address = request.form['address']
         count=request.form['Count']
@@ -261,49 +266,54 @@ def res():
         name = []
         address = []
         rating = []
-        images = ['static/food1.jpg','static/food2.jpg','static/food3.jpg','static/food4.jpg','static/food5.jpg','static/food6.jpg',
-		'static/food7.jpg','static/food8.jpg','static/food9.jpg','static/food10.jpg','static/food11.jpg','static/food12.jpg','static/food13.jpg','static/food14.jpg','static/food15.jpg']
+        images = ['static/food1.jpg','static/food2.jpg','static/food3.jpg','static/food4.jpg',
+                'static/food5.jpg','static/food6.jpg', 'static/food7.jpg','static/food8.jpg',
+                'static/food9.jpg','static/food10.jpg','static/food11.jpg','static/food12.jpg',
+                'static/food13.jpg','static/food14.jpg','static/food15.jpg']
+
         for i in data:
             name.append((i['restaurant']['name']))
             address.append((i['restaurant']['location']['address']))
             rating.append((i['restaurant']['user_rating']['aggregate_rating']))
-            result.append((i['restaurant']['name'],i['restaurant']['location']['address'],i['restaurant']['average_cost_for_two'],i['restaurant']['user_rating']['aggregate_rating']))
 
+            result.append((i['restaurant']['name'],i['restaurant']['location']['address'],
+            i['restaurant']['average_cost_for_two'],i['restaurant']['user_rating']['aggregate_rating']))
         return render_template('cards.html',address=address,name=name,rating=rating,count=int(count),image_url=images)
+
     return render_template('restaurants.html',title='Find restaurants')
-
-
-    #return render_template('home.html', title='Find restaurants')
-
 
 @app.route('/predict', methods=['POST', 'GET'])
 def predict():
+    """Function predicting the matches for the
+    user taking dynamic ratings from him/her."""
+
     # Template render and get info
     ID = session['ID']
     cur = conn.connection.cursor()
-
     r1 = cur.execute('SELECT cuisine, rate FROM cs WHERE ID = %s ', (ID,))
     s1 = cur.fetchall()
 
     cusines = {}
-
     if request.method == "POST":
+        # Getting updated (temporary) ratings information.
         d = request.form
         d = d.to_dict(flat=False)
         for cus, rate in zip(d["u_skill"], d["u_rate"]):
             cusines[cus] = float(rate)
 
+    # Extracting info from database to predict from.
+    # WIP for age, location and gender personalization.
     r2= cur.execute('SELECT name, age, location FROM user_detail WHERE ID = %s ', (ID,))
     res = cur.fetchone()
     user_name = res[0]
     age = res[1]
     location = res[2]
 
-    # Testing if the model is perfectly
-    new_model_file = open("../similarity_model.pkl", "rb")
-    new_algo = pickle.load(new_model_file)
+    # Loading the saved model from pickle file.
+    model_file = open("../pickle_files/similarity_model.pkl", "rb")
+    model = pickle.load(model_file)
 
-    def get_recommendations(user_name=None, cuisines=None, age=None, location=None, gender=None, num_recommendations=5):
+    def get_recommendations(user_name=None, cuisines=None, age=None, location=None, gender=None):
         """Function for getting recommendations by retraining the model on new cuisines
         for a particular user and re-filter the results for the introduced constraints
         Args:
@@ -322,45 +332,42 @@ def predict():
         gender: str
         Gender preference
         """
-        # data.loc["u_id"==user_name,"cusine"==k]
-        # assert rows.shape[0]!=0, "User does not exist in dataset"
-        #assert len(cuisines) == NUM_CUISINES, "Cuisines must be {NUM_CUISINES}"
-        data_file = open("../user_data.pkl", "rb")
+
+        assert len(cuisines) == len(config["CUSINES"]), \
+        "Cuisines must be %d"%(len(config["CUSINES"]))
+
+        # Loading DataFrame object from pickle
+        data_file = open("../pickle_files/user_data.pkl", "rb")
         data = pickle.load(data_file)
+
+        # Updating the rows for the current user.
         data.loc[data["u_id"] == user_name, "rating"] = list(map(float, cuisines.values()))
 
-        # print(rows)
-        # data[data["u_id"]==user_name] = rows
-        # print(data[data["u_id"]==user_name])
-        reader = Reader(rating_scale=RATING_SCALE)
-
+        # Preparing surprise compatible dataset object.
+        reader = Reader(rating_scale=config["RATING_SCALE"])
         dataset = Dataset.load_from_df(data[["u_id", "cusine", "rating"]], reader)
         trainset = dataset.build_full_trainset()
 
-        print("=" * 25)
-        print("Getting Recommendations ready")
-        print("=" * 25)
+        # Re-training the model on updated dataset.
+        model.fit(trainset)
 
-
-        new_algo.fit(trainset)
-
-        # Now getting the predictions with temporarily updated dataset
-
+        # Getting the predictions with temporarily updated dataset
         uid = trainset.to_inner_uid(user_name)
-        pred = new_algo.get_neighbors(iid=uid, k=num_recommendations)
+        pred = model.get_neighbors(iid=uid, k=config["NUM_RECOMMENDATIONS"])
+
         # When using age, location and gender constraints, we need to take into
         # account all/more recommendations
         if len(pred) == 0:
             flash("Oops! no results for these filter settings!")
         else:
+            # Getting information of the predicted users.
+            # WIP
             outs = []
             ages = []
             locations = []
             contacts = []
             for i in pred:
                 uname = trainset.to_raw_uid(i)
-                #print("\n\n\n", uname, "\n\n\n")
-                #data = cur.execute("SELECT age, location from user_detail where name=%s"%(uname,))
                 data = cur.execute('select age, location, contact_no from user_detail where name= %s ',(uname,))
                 r = cur.fetchone()
                 ages.append(r[0])
@@ -368,27 +375,21 @@ def predict():
                 contacts.append(r[2])
                 outs.append(trainset.to_raw_uid(i))
 
-            #s = ''.join([e+",  " for e in outs])
         return outs, locations, contacts, ages
     outs, locations, contacts, ages = get_recommendations(user_name, cusines, age, location)
-    print("\n\n\n", outs, "\n\n\n")
     return render_template("match_info.html", outs=outs, l=len(outs), loc=locations, cont=contacts, age=ages)
 
 
 def load_data():
-  data_file = open("../user_data.pkl", "rb")
-  df = pickle.load(data_file)
-  return df
+    """Function to load data from pickle file"""
+    data_file = open("../pickle_files/user_data.pkl", "rb")
+    df = pickle.load(data_file)
+    return df
 
 def dump_data(df):
-  data_file = open("../user_data.pkl", "wb")
-  pickle.dump(df, data_file)
-  print("Dumped Successfully!")
-
+    """Function to dump data to pickle file"""
+    data_file = open("../pickle_files/user_data.pkl", "wb")
+    pickle.dump(df, data_file)
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-##
- #create table user_detail(Id int not Null uique au' at line 1
-#mysql>  create table user_detail(Id int not Null unique auto_increment, email varchar(255),name varchar(255) not null,password varchar(255) not null,contact_no int (11),age int(3),constraint check_contact_id check(contact_no like'[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'),constraint check_mail check(email like '%@%.%'),primary key(email));
