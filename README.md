@@ -41,24 +41,31 @@ refer to [BonHacketiet.ipynb]("model_notebook/BonHacketiet.ipynb").
 
 # REVIEW OF THE APP
 ## Login Screen
-![Login Image]("front-end/static/images/pic1.jpeg")
+
+![](front-end/static/images/pic1.jpeg)
 
 ## Menu Bar
-![Menu Bar]("front-end/static/images/pic2.jpeg")
+
+![](front-end/static/images/pic2.jpeg)
 
 ## Add a Cuisine
-![Add Cusine]("front-end/static/images/pic3.jpeg")
+
+![](front-end/static/images/pic3.jpeg)
 
 ## Display Cuisines
-![Display Cuisines]("front-end/static/images/pic4.jpeg")
+
+![](front-end/static/images/pic4.jpeg)
 
 ## Find Match
-![Find Match]("front-end/static/images/pic5.jpeg")
+
+![](front-end/static/images/pic5.jpeg)
 
 ## Find restaurant
-![Find restaurant]("front-end/static/images/pic6.jpeg")
+
+![](front-end/static/images/pic6.jpeg)
 
 ## Sample recommendations
-![Sample recommendations]("front-end/static/images/pic7.jpeg")
+
+![](front-end/static/images/pic7.jpeg)
 
 Link to video submitted at hackathon - https://www.youtube.com/watch?v=i9S8DIqNA9E
