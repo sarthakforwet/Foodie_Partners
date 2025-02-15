@@ -59,5 +59,3 @@ refer to [BonHacketiet.ipynb]("model_notebook/BonHacketiet.ipynb").
 ## Sample recommendations
 
 ![](front-end/static/images/pic7.jpeg)
-
-Link to video submitted at hackathon - https://www.youtube.com/watch?v=i9S8DIqNA9E
